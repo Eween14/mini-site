@@ -21,11 +21,9 @@ app.post("/webhook", (req, res) => {
   if (!verify(req)) return res.status(401).send("bad signature");
 
   console.log("Webhook reçu → git pull");
-
-  exec("git pull origin main", { cwd: "C:\\site" }, (err, out) => {
-    if (err) return res.status(500).send(err.message);
+  
+  exec("git pull origin main && pm2 restart mini-site", { cwd: "C:\\Users\\max_r\\Documents\\mini-site" }, (err, out) => {
     console.log(out);
-    res.send("ok");
   });
 });
 
