@@ -1,6 +1,89 @@
 <!DOCTYPE html>
 <html>
-  <body>
-    <h1>Hello World 3 !</h1>
-  </body>
+<head>
+  <meta charset="utf-8" />
+  <title>Spy Game</title>
+</head>
+<body>
+
+<h1>Spy Game</h1>
+
+<!-- CREATE -->
+<button onclick="createRoom()">Créer Room</button>
+
+<!-- JOIN -->
+<button onclick="joinRoom()">Rejoindre Room</button>
+
+<!-- READY -->
+<button onclick="ready()">Ready</button>
+
+<!-- START -->
+<button onclick="startGame()">Start</button>
+
+<!-- WORD -->
+<input id="word" placeholder="mot..." />
+<button onclick="sendWord()">Send</button>
+
+<!-- CHAT -->
+<input id="chat" placeholder="chat..." />
+<button onclick="sendChat()">Chat</button>
+
+<pre id="log"></pre>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+const socket = io();
+const roomId = "test";
+
+function log(data) {
+  document.getElementById("log").textContent += JSON.stringify(data) + "\n";
+}
+
+function createRoom() {
+  socket.emit("createRoom", {
+    roomId,
+    name: "Player1",
+    password: null
+  });
+}
+
+function joinRoom() {
+  socket.emit("joinRoom", {
+    roomId,
+    name: "Player2",
+    password: null
+  });
+}
+
+function ready() {
+  socket.emit("setReady", { roomId });
+}
+
+function startGame() {
+  socket.emit("startGame", roomId);
+}
+
+function sendWord() {
+  socket.emit("word", {
+    roomId,
+    word: document.getElementById("word").value
+  });
+}
+
+function sendChat() {
+  socket.emit("chat", {
+    roomId,
+    name: "Player",
+    msg: document.getElementById("chat").value
+  });
+}
+
+socket.on("roomUpdate", log);
+socket.on("gameStart", log);
+socket.on("newWord", log);
+socket.on("chat", log);
+socket.on("error", log);
+</script>
+
+</body>
 </html>

@@ -1,46 +1,157 @@
+// D:\Dev\mini-site\site\server.js
+
 const express = require("express");
-const { exec } = require("child_process");
-const crypto = require("crypto");
+const http = require("http");
+const { Server } = require("socket.io");
 
 const app = express();
+const server = http.createServer(app);
+const io = new Server(server);
 
-app.use(express.json());
-
-// Serveur web normal
+// fichiers statiques (frontend)
 app.use(express.static("public"));
 
-// --- WEBHOOK GITHUB ---
-const SECRET = "monsecretwebhook"; // à choisir
+/* =========================
+   ÉTAT EN MÉMOIRE (ROOMS)
+========================= */
 
-function verifySignature(req) {
-  const signature = req.headers["x-hub-signature-256"];
-  const body = JSON.stringify(req.body);
+const rooms = {};
 
-  const hmac = crypto.createHmac("sha256", SECRET);
-  const digest = "sha256=" + hmac.update(body).digest("hex");
+/* =========================
+   POKÉMONS SIMPLES
+========================= */
 
-  return signature === digest;
+const POKEMONS = [
+  ["Pikachu", "Raichu"],
+  ["Bulbizarre", "Herbizarre"],
+  ["Salamèche", "Reptincel"]
+];
+
+function pickPair() {
+  return POKEMONS[Math.floor(Math.random() * POKEMONS.length)];
 }
 
-app.post("/webhook", (req, res) => {
-  if (!verifySignature(req)) {
-    return res.status(401).send("Unauthorized");
-  }
+/* =========================
+   SOCKET.IO
+========================= */
 
-  console.log("Webhook reçu, pull du repo...");
+io.on("connection", (socket) => {
 
-  exec("git pull origin main", { cwd: "C:\\site" }, (err, stdout) => {
-    if (err) {
-      console.error(err);
-      return res.status(500).send("Erreur deploy");
-    }
+  console.log("User connected:", socket.id);
 
-    console.log(stdout);
-    res.send("OK deploy");
+  // -------------------------
+  // CREATE ROOM
+  // -------------------------
+  socket.on("createRoom", ({ roomId, name, password }) => {
+
+    rooms[roomId] = {
+      host: socket.id,
+      password: password || null,
+      players: [],
+      state: "lobby",
+      round: 0,
+      order: [],
+      spyId: null,
+      votes: {},
+      scores: { team: 0, spy: 0 }
+    };
+
+    socket.join(roomId);
+
+    rooms[roomId].players.push({
+      id: socket.id,
+      name,
+      ready: false
+    });
+
+    io.to(roomId).emit("roomUpdate", rooms[roomId]);
   });
+
+  // -------------------------
+  // JOIN ROOM
+  // -------------------------
+  socket.on("joinRoom", ({ roomId, name, password }) => {
+
+    const room = rooms[roomId];
+    if (!room) return socket.emit("error", "Room inexistante");
+
+    if (room.password && room.password !== password)
+      return socket.emit("error", "Mauvais mot de passe");
+
+    socket.join(roomId);
+
+    room.players.push({
+      id: socket.id,
+      name,
+      ready: false
+    });
+
+    io.to(roomId).emit("roomUpdate", room);
+  });
+
+  // -------------------------
+  // READY
+  // -------------------------
+  socket.on("setReady", ({ roomId }) => {
+
+    const room = rooms[roomId];
+    if (!room) return;
+
+    const player = room.players.find(p => p.id === socket.id);
+    if (!player) return;
+
+    player.ready = true;
+
+    io.to(roomId).emit("roomUpdate", room);
+  });
+
+  // -------------------------
+  // START GAME (HOST ONLY)
+  // -------------------------
+  socket.on("startGame", (roomId) => {
+
+    const room = rooms[roomId];
+    if (!room) return;
+
+    if (room.host !== socket.id) return;
+
+    const [normal, spy] = pickPair();
+
+    const spyIndex = Math.floor(Math.random() * room.players.length);
+    room.spyId = room.players[spyIndex].id;
+
+    room.players.forEach(p => {
+      p.pokemon = (p.id === room.spyId) ? spy : normal;
+    });
+
+    room.order = [...room.players].sort(() => Math.random() - 0.5);
+    room.state = "playing";
+    room.round = 1;
+
+    io.to(roomId).emit("gameStart", room);
+  });
+
+  // -------------------------
+  // WORD (tour)
+  // -------------------------
+  socket.on("word", ({ roomId, word }) => {
+
+    io.to(roomId).emit("newWord", {
+      playerId: socket.id,
+      word
+    });
+  });
+
+  // -------------------------
+  // CHAT
+  // -------------------------
+  socket.on("chat", ({ roomId, name, msg }) => {
+
+    io.to(roomId).emit("chat", { name, msg });
+  });
+
 });
 
-// serveur
-app.listen(80, () => {
-  console.log("Site + webhook actif sur port 80");
+server.listen(80, () => {
+  console.log("Server running on port 80");
 });
