@@ -17,6 +17,60 @@ app.use(express.static("public"));
 
 const rooms = {};
 
+function updateRoom(roomId) {
+
+  const room = rooms[roomId];
+
+  if (!room) return;
+
+  io.to(roomId).emit("roomUpdate", room);
+}
+
+function removePlayer(socket) {
+
+  for (const roomId in rooms) {
+
+    const room = rooms[roomId];
+
+    const playerIndex =
+      room.players.findIndex(
+        p => p.id === socket.id
+      );
+
+    if (playerIndex === -1) continue;
+
+    // remove player
+    room.players.splice(playerIndex, 1);
+
+    // room empty => delete room
+    if (room.players.length === 0) {
+
+      delete rooms[roomId];
+
+      console.log("Room deleted:", roomId);
+
+      return;
+    }
+
+    // host left => random new host
+    if (room.host === socket.id) {
+
+      const randomPlayer =
+        room.players[
+          Math.floor(
+            Math.random() * room.players.length
+          )
+        ];
+
+      room.host = randomPlayer.id;
+    }
+
+    updateRoom(roomId);
+
+    return;
+  }
+}
+
 /* =========================
    POKÉMONS SIMPLES
 ========================= */
@@ -64,7 +118,19 @@ io.on("connection", (socket) => {
       ready: false
     });
 
-    io.to(roomId).emit("roomUpdate", rooms[roomId]);
+    updateRoom(roomId);
+  });
+  
+  socket.on("leaveRoom", () => {
+
+    removePlayer(socket);
+  });
+  
+  socket.on("disconnect", () => {
+
+    console.log("Disconnected:", socket.id);
+
+    removePlayer(socket);
   });
 
   // -------------------------
@@ -86,7 +152,7 @@ io.on("connection", (socket) => {
       ready: false
     });
 
-    io.to(roomId).emit("roomUpdate", room);
+    updateRoom(roomId);
   });
 
   // -------------------------
@@ -102,7 +168,7 @@ io.on("connection", (socket) => {
 
     player.ready = true;
 
-    io.to(roomId).emit("roomUpdate", room);
+    updateRoom(roomId);
   });
 
   // -------------------------

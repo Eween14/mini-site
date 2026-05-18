@@ -344,6 +344,8 @@
 
 	function leaveLobby() {
 
+	  socket.emit("leaveRoom");
+
 	  document.getElementById("roomPage").style.display =
 		"none";
 
@@ -353,6 +355,10 @@
 	  resetMainPage();
 
 	  currentRoomId = null;
+
+	  document.getElementById("playersList").innerHTML = "";
+
+	  document.getElementById("chatMessages").innerHTML = "";
 	}
 
     function resetMainPage() {
@@ -442,7 +448,13 @@
 
         const li = document.createElement("li");
 
-        li.textContent = player.name;
+        const isHost =
+		  player.id === room.host;
+
+		li.textContent =
+		  isHost
+			? `${player.name} 👑`
+			: player.name;
 
         playersList.appendChild(li);
       });
