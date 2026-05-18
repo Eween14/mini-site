@@ -63,6 +63,13 @@
       width: 200px;
       padding: 10px;
     }
+	
+	#nicknameInput {
+	  font-size: 22px;
+	  text-align: center;
+	  width: 200px;
+	  padding: 10px;
+	}
 
     .closeButton {
       position: absolute;
@@ -104,15 +111,22 @@
 
     <div class="modalContent">
 
-      <div class="closeButton" onclick="closeCreateRoomModal()">
-        ✕
-      </div>
+		<div class="closeButton" onclick="closeCreateRoomModal()">
+		✕
+		</div>
 
-      <input id="roomIdInput" maxlength="6">
+		<input id="roomIdInput" maxlength="6">
 
-      <button onclick="confirmCreateRoom()">
-        Créer
-      </button>
+		<input
+		  id="nicknameInput"
+		  maxlength="16"
+		  placeholder="Pseudo"
+		  value="Host"
+		>
+
+		<button onclick="confirmCreateRoom()">
+		  Créer
+		</button>
 
     </div>
 
@@ -187,17 +201,20 @@
 
     function confirmCreateRoom() {
 
-      const roomId = document.getElementById("roomIdInput").value;
+		const roomId = document.getElementById("roomIdInput").value;
 
-      currentRoomId = roomId;
+		const nickname =
+		  document.getElementById("nicknameInput").value.trim() || "Host";
 
-      socket.emit("createRoom", {
-        roomId,
-        name: "Host",
-        password: null
-      });
+		currentRoomId = roomId;
 
-      closeCreateRoomModal();
+		socket.emit("createRoom", {
+		  roomId,
+		  name: nickname,
+		  password: null
+		});
+
+		closeCreateRoomModal();
     }
 
     /* =========================
