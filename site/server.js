@@ -24,6 +24,18 @@ function updateRoom(roomId) {
   if (!room) return;
 
   io.to(roomId).emit("roomUpdate", room);
+
+  // check si tous les sockets encore connectés sont valides
+  room.players.forEach(p => {
+
+    const socketExists =
+      io.sockets.sockets.has(p.id);
+
+    if (!socketExists) {
+
+      io.to(p.id).emit("kickedFromRoom");
+    }
+  });
 }
 
 function removePlayer(socket) {
@@ -33,39 +45,36 @@ function removePlayer(socket) {
     const room = rooms[roomId];
 
     const playerIndex =
-      room.players.findIndex(
-        p => p.id === socket.id
-      );
+      room.players.findIndex(p => p.id === socket.id);
 
     if (playerIndex === -1) continue;
 
-    // remove player
+    const wasHost = room.host === socket.id;
+
     room.players.splice(playerIndex, 1);
 
-    // room empty => delete room
+    // room vide
     if (room.players.length === 0) {
 
       delete rooms[roomId];
-
-      console.log("Room deleted:", roomId);
-
       return;
     }
 
-    // host left => random new host
-    if (room.host === socket.id) {
+    // host transfer
+    if (wasHost) {
 
-      const randomPlayer =
+      const newHost =
         room.players[
-          Math.floor(
-            Math.random() * room.players.length
-          )
+          Math.floor(Math.random() * room.players.length)
         ];
 
-      room.host = randomPlayer.id;
+      room.host = newHost.id;
     }
 
     updateRoom(roomId);
+
+    // IMPORTANT: informer le client qu'il est sorti
+    socket.emit("leftRoom");
 
     return;
   }

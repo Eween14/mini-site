@@ -342,24 +342,12 @@
         confirmJoinLobby;
     }
 
-	function leaveLobby() {
+    function leaveLobby() {
 
-	  socket.emit("leaveRoom");
+      socket.emit("leaveRoom");
 
-	  document.getElementById("roomPage").style.display =
-		"none";
-
-	  document.getElementById("mainPage").style.display =
-		"flex";
-
-	  resetMainPage();
-
-	  currentRoomId = null;
-
-	  document.getElementById("playersList").innerHTML = "";
-
-	  document.getElementById("chatMessages").innerHTML = "";
-	}
+      forceBackToMenu();
+    }
 
     function resetMainPage() {
 
@@ -422,6 +410,32 @@
         name,
         password: null
       });
+    }
+
+    /* =========================
+       LEAVE ROOM
+    ========================== */
+    socket.on("leftRoom", () => {
+
+      forceBackToMenu();
+    });
+
+    socket.on("kickedFromRoom", () => {
+
+      forceBackToMenu();
+    });
+
+    function forceBackToMenu() {
+
+      document.getElementById("roomPage").style.display = "none";
+      document.getElementById("mainPage").style.display = "flex";
+
+      resetMainPage();
+
+      currentRoomId = null;
+
+      document.getElementById("playersList").innerHTML = "";
+      document.getElementById("chatMessages").innerHTML = "";
     }
 
     /* =========================
