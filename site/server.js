@@ -167,7 +167,7 @@ io.on("connection", (socket) => {
   // -------------------------
   // READY
   // -------------------------
-  socket.on("setReady", ({ roomId }) => {
+  socket.on("setReady", ({ roomId, ready }) => {
 
     const room = rooms[roomId];
     if (!room) return;
@@ -175,7 +175,22 @@ io.on("connection", (socket) => {
     const player = room.players.find(p => p.id === socket.id);
     if (!player) return;
 
-    player.ready = true;
+    player.ready = ready;
+
+    updateRoom(roomId);
+  });
+
+  // -------------------------
+  // GAME SELECT
+  // -------------------------
+  socket.on("selectGame", ({ roomId, game }) => {
+
+    const room = rooms[roomId];
+    if (!room) return;
+
+    if (room.host !== socket.id) return;
+
+    room.game = game;
 
     updateRoom(roomId);
   });

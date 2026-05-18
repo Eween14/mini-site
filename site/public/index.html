@@ -164,6 +164,60 @@
 	  border-bottom-left-radius: 0;
 	}
 
+    /* =========================
+       GAME SELECT
+    ========================= */
+
+    #gameSelect {
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .gameOption {
+      padding: 10px;
+      border-radius: 6px;
+      background: #2f3136;
+      text-align: center;
+      cursor: pointer;
+      border: 2px solid transparent;
+    }
+
+    .gameOption.selected {
+      border-color: #89fa7d;
+    }
+
+    /* =========================
+       READY BUTTON
+    ========================= */
+
+    #bottomButton {
+      margin-top: 20px;
+      width: 100%;
+      padding: 14px;
+      font-size: 18px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .readyOff {
+      background: transparent;
+      border: 2px solid #888;
+      color: white;
+    }
+
+    .readyOn {
+      background: #89fa7d;
+      color: white;
+    }
+
+    .disabled {
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
   </style>
 </head>
 
@@ -220,35 +274,38 @@
 		ROOM
 		</div>
 
-		<ul id="playersList"></ul>
+        <ul id="playersList"></ul>
 
-		<!-- CHAT -->
+        <!-- CHAT -->
+        <div id="chatContainer">
 
-		<div id="chatContainer">
+          <div id="chatMessages"></div>
 
-		  <div id="chatMessages"></div>
+          <div id="chatInputRow">
 
-		  <div id="chatInputRow">
+            <input id="chatInput" placeholder="Message...">
 
-			<input
-			  id="chatInput"
-			  placeholder="Message..."
-			>
+            <button id="sendChatButton" onclick="sendChat()">
+              ↑
+            </button>
 
-			<button id="sendChatButton"
-					onclick="sendChat()">
-			  ↑
-			</button>
+          </div>
+        </div>
 
-		  </div>
+        <!-- GAME SELECT -->
+        <div id="gameSelect">
+          <div class="gameOption selected" onclick="selectGame('undercover')">
+            Undercover 🕵️
+          </div>
+        </div>
 
-		</div>
+        <!-- BOTTOM BUTTON -->
+        <button id="bottomButton"></button>
 
-		<!-- LEAVE -->
-
-		<button onclick="leaveLobby()">
-		  Leave lobby
-		</button>
+        <!-- LEAVE -->
+        <button onclick="leaveLobby()">
+          Leave lobby
+        </button>
 
     </div>
 
@@ -266,6 +323,8 @@
 
     let currentMode = null;
     let currentRoomId = null;
+    let isReady = false;
+    let selectedGame = "undercover";
 
     /* =========================
        RANDOM ROOM ID
@@ -444,35 +503,69 @@
 
     socket.on("roomUpdate", (room) => {
 
-      document.getElementById("mainPage").style.display =
-        "none";
+      window.lastRoom = room;
 
-      document.getElementById("roomPage").style.display =
-        "flex";
+      document.getElementById("mainPage").style.display = "none";
+      document.getElementById("roomPage").style.display = "flex";
 
-      document.getElementById("roomCode").textContent =
-        currentRoomId;
+      document.getElementById("roomCode").textContent = currentRoomId;
 
-      const playersList =
-        document.getElementById("playersList");
-
+      // PLAYERS
+      const playersList = document.getElementById("playersList");
       playersList.innerHTML = "";
 
       room.players.forEach(player => {
 
         const li = document.createElement("li");
 
-        const isHost =
-		  player.id === room.host;
+        const isHost = room.host === player.id;
 
-		li.textContent =
-		  isHost
-			? `${player.name} 👑`
-			: player.name;
+        const ready = player.ready ? " ✔" : "";
+
+        li.textContent =
+          (isHost ? "👑 " : "") +
+          player.name +
+          ready;
 
         playersList.appendChild(li);
       });
 
+      // =========================
+      // BOTTOM BUTTON LOGIC
+      // =========================
+
+      const mySocketId = socket.id;
+      const me = room.players.find(p => p.id === mySocketId);
+
+      const isHost = room.host === mySocketId;
+
+      const allReady =
+        room.players.length > 1 &&
+        room.players.every(p => p.ready);
+
+      const bottomBtn = document.getElementById("bottomButton");
+
+      if (isHost) {
+
+        bottomBtn.textContent = "JOUER";
+
+        bottomBtn.onclick = () => {
+          socket.emit("startGame", currentRoomId);
+        };
+
+        bottomBtn.className =
+          allReady ? "" : "disabled";
+
+      } else {
+
+        bottomBtn.textContent =
+          isReady ? "PRÊT ✔" : "PRET";
+
+        bottomBtn.onclick = toggleReady;
+
+        bottomBtn.className =
+          isReady ? "readyOn" : "readyOff";
+      }
     });
 
     /* =========================
@@ -517,6 +610,51 @@
 	  chatMessages.scrollTop =
 		chatMessages.scrollHeight;
 	});
+
+
+    /* =========================
+       GAME SELECT
+    ========================== */
+
+    function selectGame(game) {
+
+      const room = window.lastRoom;
+
+      const mySocketId = socket.id;
+
+      const me = room?.players?.find(p => p.id === mySocketId);
+
+      if (!me) return;
+
+      const isHost = room.host === mySocketId;
+
+      if (!isHost) return;
+
+      selectedGame = game;
+
+      document.querySelectorAll(".gameOption")
+        .forEach(el => el.classList.remove("selected"));
+
+      event.target.classList.add("selected");
+
+      socket.emit("selectGame", {
+        roomId: currentRoomId,
+        game
+      });
+    }
+
+    /* =========================
+       GAME READY
+    ========================== */
+    function toggleReady() {
+
+      isReady = !isReady;
+
+      socket.emit("setReady", {
+        roomId: currentRoomId,
+        ready: isReady
+      });
+    }
 
   </script>
 
