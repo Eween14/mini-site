@@ -762,6 +762,7 @@
       window.lastRoom = room;
 
       document.getElementById("mainPage").style.display = "none";
+      document.getElementById("roomPage").style.display = "none";
       document.getElementById("configPage").style.display = "none";
 
       gameConfig = room.config || gameConfig;
@@ -772,11 +773,13 @@
 
         document.getElementById("mainPage").style.display = "none";
         document.getElementById("configPage").style.display = "none";
+        document.getElementById("roomPage").style.display = "flex";
       }
 
       else if (room.state === "config") {
 
         document.getElementById("mainPage").style.display = "none";
+        document.getElementById("roomPage").style.display = "none";
         document.getElementById("configPage").style.display = "flex";
       }
 
