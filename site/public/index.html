@@ -5,1149 +5,127 @@
   <meta charset="UTF-8">
   <title>GAMEROOM</title>
 
-  <style>
-
-    body {
-      margin: 0;
-      background: #202225;
-      color: white;
-      font-family: Arial, sans-serif;
-    }
-
-    /* =========================
-       CENTER COLUMN
-    ========================== */
-
-    .page {
-      width: 100%;
-      height: 100vh;
-
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .centerColumn {
-      width: 400px;
-
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    /* =========================
-       TEXT
-    ========================== */
-
-    h1 {
-      text-align: center;
-      margin-bottom: 30px;
-      font-size: 48px;
-    }
-
-    .roomCode {
-      text-align: center;
-      font-size: 40px;
-      font-weight: bold;
-    }
-
-    /* =========================
-       INPUTS
-    ========================== */
-
-    input {
-      width: 100%;
-      box-sizing: border-box;
-
-      padding: 14px;
-
-      font-size: 20px;
-
-      border: none;
-      border-radius: 6px;
-
-      outline: none;
-    }
-
-    /* =========================
-       BUTTONS
-    ========================== */
-
-    .buttonRow {
-      display: flex;
-      gap: 10px;
-    }
-
-    button {
-      flex: 1;
-
-      padding: 14px;
-
-      font-size: 18px;
-
-      border: none;
-      border-radius: 6px;
-
-      cursor: pointer;
-    }
-
-    /* =========================
-       ROOM VIEW
-    ========================== */
-
-    #roomPage {
-      display: none;
-    }
-
-    #playersList {
-      list-style: none;
-      padding: 0;
-      margin-top: 20px;
-
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    #playersList li {
-      background: #2f3136;
-      padding: 12px;
-      border-radius: 6px;
-    }
-	
-	/* =========================
-	   CHAT
-	========================== */
-
-	#chatContainer {
-	  margin-top: 20px;
-
-	  display: flex;
-	  flex-direction: column;
-	  gap: 10px;
-	}
-
-	#chatMessages {
-	  height: 220px;
-
-	  background: #2f3136;
-
-	  border-radius: 6px;
-
-	  padding: 10px;
-
-	  overflow-y: auto;
-
-	  box-sizing: border-box;
-	}
-
-	.chatMessage {
-	  margin-bottom: 8px;
-	}
-
-	#chatInputRow {
-	  display: flex;
-	  gap: 0;
-	}
-
-	#chatInput {
-	  flex: 1;
-
-	  border-top-right-radius: 0;
-	  border-bottom-right-radius: 0;
-	}
-
-	#sendChatButton {
-	  width: 60px;
-
-	  border-top-left-radius: 0;
-	  border-bottom-left-radius: 0;
-	}
-
-    /* =========================
-       GAME SELECT
-    ========================= */
-
-    #gameSelect {
-      margin-top: 10px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .gameOption {
-      padding: 10px;
-      border-radius: 6px;
-      background: #2f3136;
-      text-align: center;
-      cursor: pointer;
-      border: 2px solid transparent;
-    }
-
-    .gameOption.selected {
-      border-color: #89fa7d;
-    }
-
-    /* =========================
-       READY BUTTON
-    ========================= */
-
-    #bottomButton {
-      margin-top: 20px;
-      width: 100%;
-      padding: 14px;
-      font-size: 18px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-
-    .readyOff {
-      background: transparent;
-      border: 2px solid #888;
-      color: white;
-    }
-
-    .readyOn {
-      background: #89fa7d;
-      color: white;
-    }
-
-    .disabled {
-      opacity: 0.4;
-      pointer-events: none;
-    }
-
-    /* =========================
-       TOGGLE
-    ========================= */
-
-    .switch {
-      position: relative;
-      display: inline-block;
-      width: 54px;
-      height: 28px;
-    }
-
-    .switch input {
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
-
-    .slider {
-      position: absolute;
-      cursor: pointer;
-
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-
-      background-color: #555;
-
-      transition: 0.2s;
-
-      border-radius: 34px;
-    }
-
-    .slider:before {
-      position: absolute;
-      content: "";
-
-      height: 22px;
-      width: 22px;
-
-      left: 3px;
-      bottom: 3px;
-
-      background-color: white;
-
-      transition: 0.2s;
-
-      border-radius: 50%;
-    }
-
-    .switch input:checked + .slider {
-      background-color: #89fa7d;
-    }
-
-    .switch input:checked + .slider:before {
-      transform: translateX(26px);
-    }
-
-    /* =========================
-       CONFIG PAGE
-    ========================= */
-
-    #configPage {
-      display: none;
-    }
-
-    .sectionTitle {
-      text-align: center;
-      font-size: 28px;
-      margin-top: 20px;
-    }
-
-    .optionList {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .optionItem {
-      background: #2f3136;
-      padding: 12px;
-      border-radius: 6px;
-      cursor: pointer;
-      text-align: center;
-      border: 2px solid transparent;
-    }
-
-    .optionItem.selected {
-      border-color: #89fa7d;
-    }
-
-    .toggleRow {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .descriptionText {
-      background: #2f3136;
-      padding: 12px;
-      border-radius: 6px;
-      line-height: 1.5;
-    }
-
-    #launchGameButton {
-      margin-top: 20px;
-    }
-
-  </style>
+  <link rel="stylesheet" href="/css/global.css">
+  <link rel="stylesheet" href="/css/lobby.css">
+  <link rel="stylesheet" href="/css/config.css">
 </head>
 
 <body>
 
-  <!-- =========================
-       MAIN PAGE
-  ========================== -->
+<!-- ================= MAIN ================= -->
+<div class="page" id="mainPage">
 
-  <div class="page" id="mainPage">
+  <div class="centerColumn">
 
-    <div class="centerColumn">
+    <h1>GAMEROOM</h1>
 
-      <h1>GAMEROOM</h1>
+    <input id="nameInput" placeholder="Your name..." maxlength="16">
 
-      <!-- NAME -->
-      <input
-        id="nameInput"
-        placeholder="Your name..."
-        maxlength="16"
-      >
+    <div id="roomInputContainer"></div>
 
-      <!-- ROOM ID -->
-      <div id="roomInputContainer"></div>
+    <div class="buttonRow">
+      <button id="leftButton" onclick="createLobbyMode()">Create lobby</button>
+      <button id="rightButton" onclick="joinLobbyMode()">Join lobby</button>
+    </div>
 
-      <!-- BUTTONS -->
-      <div class="buttonRow">
+  </div>
+</div>
 
-        <button id="leftButton" onclick="createLobbyMode()">
-          Create lobby
-        </button>
+<!-- ================= ROOM ================= -->
+<div class="page" id="roomPage">
 
-        <button id="rightButton" onclick="joinLobbyMode()">
-          Join lobby
-        </button>
+  <div class="centerColumn">
 
+    <h1>GAMEROOM</h1>
+
+    <div class="roomCode" id="roomCode">ROOM</div>
+
+    <ul id="playersList"></ul>
+
+    <div id="gameSelect">
+      <div class="gameOption selected" onclick="selectGame('undercover')">Undercover 🕵️</div>
+    </div>
+
+    <button id="bottomButton"></button>
+    <button onclick="leaveLobby()">Leave lobby</button>
+
+  </div>
+</div>
+
+<!-- ================= CONFIG ================= -->
+<div class="page" id="configPage">
+
+  <div class="centerColumn">
+
+    <h1>GAMEROOM</h1>
+
+    <!-- CHAT -->
+    <div id="chatContainer">
+
+      <div id="chatMessages"></div>
+
+      <div id="chatInputRow">
+        <input id="chatInput" placeholder="Message...">
+        <button onclick="sendChat()">↑</button>
       </div>
 
     </div>
 
-  </div>
+    <!-- SUBJECTS -->
+    <div class="sectionTitle">Sujet</div>
 
-  <!-- =========================
-       ROOM PAGE
-  ========================== -->
-
-  <div class="page" id="roomPage">
-
-    <div class="centerColumn">
-
-		<h1>GAMEROOM</h1>
-
-		<div class="roomCode" id="roomCode">
-		ROOM
-		</div>
-
-        <ul id="playersList"></ul>
-
-        <!-- GAME SELECT -->
-        <div id="gameSelect">
-          <div class="gameOption selected" onclick="selectGame('undercover')">
-            Undercover 🕵️
-          </div>
-        </div>
-
-        <!-- BOTTOM BUTTON -->
-        <button id="bottomButton"></button>
-
-        <!-- LEAVE -->
-        <button onclick="leaveLobby()">
-          Leave lobby
-        </button>
-
+    <div class="optionList" id="subjectsList">
+      <div class="optionItem selected" data-subject="pokemon" onclick="toggleSubject('pokemon', event)">Pokemon</div>
+      <div class="optionItem" data-subject="custom" onclick="toggleSubject('custom', event)">Custom</div>
     </div>
 
-  </div>
+    <!-- THEME -->
+    <div class="sectionTitle" id="themeTitle">Thème</div>
 
-  <!-- =========================
-       CONFIG PAGE
-  ========================== -->
-
-  <div class="page" id="configPage">
-
-    <div class="centerColumn">
-
-      <h1>GAMEROOM</h1>
-
-      <!-- CHAT (CONFIG) -->
-      <div id="chatContainer">
-
-        <div id="chatMessages"></div>
-
-        <div id="chatInputRow">
-
-          <input id="chatInput" placeholder="Message...">
-
-          <button id="sendChatButton" onclick="sendChat()">
-            ↑
-          </button>
-
-        </div>
-
-      </div>
-
-      <!-- SUBJECT -->
-
-      <div class="sectionTitle">
-        Sujet
-      </div>
-
-      <div
-        class="optionList"
-        id="subjectsList"
-      >
-
-        <div
-          class="optionItem selected"
-          data-subject="pokemon"
-          onclick="toggleSubject('pokemon', event)"
-        >
-          Pokemon
-        </div>
-
-        <div
-          class="optionItem"
-          data-subject="custom"
-          onclick="toggleSubject('custom', event)"
-        >
-          Custom
-        </div>
-
-      </div>
-
-      <!-- THEME -->
-
-      <div
-        class="sectionTitle"
-        id="themeTitle"
-      >
-        Thème
-      </div>
-
-      <!-- THEMES NORMAL -->
-
-      <div
-        class="optionList"
-        id="themesList"
-      >
-
-        <div
-          class="optionItem selected"
-          data-theme="characters"
-          onclick="selectTheme('characters', event)"
-        >
-          Personnages
-        </div>
-
-        <div
-          class="optionItem"
-          data-theme="locations"
-          onclick="selectTheme('locations', event)"
-        >
-          Lieux
-        </div>
-
-        <div
-          class="optionItem"
-          data-theme="groups"
-          onclick="selectTheme('groups', event)"
-        >
-          Groupes
-        </div>
-
-        <div
-          class="optionItem"
-          data-theme="powers"
-          onclick="selectTheme('powers', event)"
-        >
-          Pouvoirs
-        </div>
-
-      </div>
-
-      <!-- CUSTOM INPUT -->
-
-      <input
-        id="customThemeInput"
-        placeholder="Votre mot personnalisé..."
-        style="display:none;"
-      >
-
-      <!-- SPY -->
-
-      <div class="sectionTitle">
-        Espion
-      </div>
-
-      <div class="toggleRow">
-
-        <div>
-          Espion a un mot
-        </div>
-
-        <label class="switch">
-
-          <input
-            type="checkbox"
-            id="spyHasWordToggle"
-            checked
-            onchange="toggleSpyHasWord()"
-          >
-
-          <span class="slider"></span>
-
-        </label>
-
-      </div>
-
-      <div
-        class="descriptionText"
-        id="spyDescription"
-      ></div>
-
-      <!-- LAUNCH -->
-
-      <button
-        id="launchGameButton"
-        onclick="launchGame()"
-      >
-        Lancer
-      </button>
-
+    <div class="optionList" id="themesList">
+      <div class="optionItem selected" data-theme="characters" onclick="selectTheme('characters', event)">Personnages</div>
+      <div class="optionItem" data-theme="locations" onclick="selectTheme('locations', event)">Lieux</div>
+      <div class="optionItem" data-theme="groups" onclick="selectTheme('groups', event)">Groupes</div>
+      <div class="optionItem" data-theme="powers" onclick="selectTheme('powers', event)">Pouvoirs</div>
     </div>
 
+    <input id="customThemeInput" placeholder="Votre mot personnalisé..." style="display:none;">
+
+    <!-- SPY -->
+    <div class="sectionTitle">Espion</div>
+
+    <div class="toggleRow">
+      <div>Espion a un mot</div>
+
+      <label class="switch">
+        <input type="checkbox" id="spyHasWordToggle" checked onchange="toggleSpyHasWord()">
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="descriptionText" id="spyDescription"></div>
+
+    <button id="launchGameButton" onclick="launchGame()">Lancer</button>
+
   </div>
+</div>
 
-  <!-- =========================
-       SOCKET.IO
-  ========================== -->
+<!-- ================= SCRIPTS ================= -->
+<script src="/socket.io/socket.io.js"></script>
 
-  <script src="/socket.io/socket.io.js"></script>
+<script src="/js/core/socket.js"></script>
+<script src="/js/core/state.js"></script>
+<script src="/js/core/router.js"></script>
 
-  <script>
+<script src="/js/components/chat.js"></script>
+<script src="/js/components/playersList.js"></script>
 
-    const socket = io();
+<script src="/js/views/mainView.js"></script>
+<script src="/js/views/lobbyView.js"></script>
+<script src="/js/views/configView.js"></script>
 
-    let currentMode = null;
-    let currentRoomId = null;
-    let isReady = false;
-    let selectedGame = "undercover";
-
-    let gameConfig = {
-      subjects: ["pokemon"],
-      theme: "characters",
-      spyHasWord: true
-    };
-
-    /* =========================
-       RANDOM ROOM ID
-    ========================== */
-
-    function generateRoomId() {
-
-      const chars =
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-
-      let result = "";
-
-      for (let i = 0; i < 6; i++) {
-
-        result += chars[
-          Math.floor(Math.random() * chars.length)
-        ];
-      }
-
-      return result;
-    }
-
-    /* =========================
-       MODES
-    ========================== */
-
-    function createLobbyMode() {
-
-      currentMode = "create";
-
-      document.getElementById("roomInputContainer").innerHTML = `
-        <input
-          id="roomIdInput"
-          value="${generateRoomId()}"
-          maxlength="6"
-        >
-      `;
-
-      document.getElementById("leftButton").textContent =
-        "<- Back";
-
-      document.getElementById("rightButton").textContent =
-        "Create ->";
-
-      document.getElementById("leftButton").onclick =
-        resetMainPage;
-
-      document.getElementById("rightButton").onclick =
-        confirmCreateLobby;
-    }
-
-    function joinLobbyMode() {
-
-      currentMode = "join";
-
-      document.getElementById("roomInputContainer").innerHTML = `
-        <input
-          id="roomIdInput"
-          placeholder="ROOM ID..."
-          maxlength="6"
-        >
-      `;
-
-      document.getElementById("leftButton").textContent =
-        "<- Back";
-
-      document.getElementById("rightButton").textContent =
-        "Join ->";
-
-      document.getElementById("leftButton").onclick =
-        resetMainPage;
-
-      document.getElementById("rightButton").onclick =
-        confirmJoinLobby;
-    }
-
-    function leaveLobby() {
-
-      socket.emit("leaveRoom");
-
-      forceBackToMenu();
-    }
-
-    function resetMainPage() {
-
-      currentMode = null;
-
-      document.getElementById("roomInputContainer").innerHTML = "";
-
-      document.getElementById("leftButton").textContent =
-        "Create lobby";
-
-      document.getElementById("rightButton").textContent =
-        "Join lobby";
-
-      document.getElementById("leftButton").onclick =
-        createLobbyMode;
-
-      document.getElementById("rightButton").onclick =
-        joinLobbyMode;
-    }
-
-    /* =========================
-       CREATE ROOM
-    ========================== */
-
-    function confirmCreateLobby() {
-
-      const roomId =
-        document.getElementById("roomIdInput").value;
-
-      const name =
-        document.getElementById("nameInput").value.trim()
-        || "Host";
-
-      currentRoomId = roomId;
-
-      socket.emit("createRoom", {
-        roomId,
-        name,
-        password: null
-      });
-    }
-
-    /* =========================
-       JOIN ROOM
-    ========================== */
-
-    function confirmJoinLobby() {
-
-      const roomId =
-        document.getElementById("roomIdInput").value;
-
-      const name =
-        document.getElementById("nameInput").value.trim()
-        || "Player";
-
-      currentRoomId = roomId;
-
-      socket.emit("joinRoom", {
-        roomId,
-        name,
-        password: null
-      });
-    }
-
-    /* =========================
-       LEAVE ROOM
-    ========================== */
-    socket.on("leftRoom", () => {
-
-      forceBackToMenu();
-    });
-
-    socket.on("kickedFromRoom", () => {
-
-      forceBackToMenu();
-    });
-
-    function forceBackToMenu() {
-
-      document.getElementById("roomPage").style.display = "none";
-      document.getElementById("mainPage").style.display = "flex";
-
-      resetMainPage();
-
-      currentRoomId = null;
-
-      document.getElementById("playersList").innerHTML = "";
-    }
-
-    /* =========================
-       ROOM UPDATE
-    ========================== */
-
-    socket.on("roomUpdate", (room) => {
-
-      window.lastRoom = room;
-
-      document.getElementById("mainPage").style.display = "none";
-      document.getElementById("roomPage").style.display = "none";
-      document.getElementById("configPage").style.display = "none";
-
-      gameConfig = room.config || gameConfig;
-
-      document.getElementById("roomCode").textContent = currentRoomId;
-
-      if (room.state === "lobby") {
-
-        document.getElementById("mainPage").style.display = "none";
-        document.getElementById("configPage").style.display = "none";
-        document.getElementById("roomPage").style.display = "flex";
-      }
-
-      else if (room.state === "config") {
-
-        document.getElementById("mainPage").style.display = "none";
-        document.getElementById("roomPage").style.display = "none";
-        document.getElementById("configPage").style.display = "flex";
-      }
-
-      // PLAYERS
-      const playersList = document.getElementById("playersList");
-      playersList.innerHTML = "";
-
-      room.players.forEach(player => {
-
-        const li = document.createElement("li");
-
-        const isHost = room.host === player.id;
-
-        const ready = player.ready ? " ✔" : "";
-
-        li.textContent =
-          (isHost ? "👑 " : "") +
-          player.name +
-          ready;
-
-        playersList.appendChild(li);
-      });
-
-    /* =========================
-       CONFIG PAGE SYNC
-    ========================= */
-
-    // SUBJECTS
-
-    document
-      .querySelectorAll("#subjectsList .optionItem")
-      .forEach(el => {
-
-        const subject =
-          el.dataset.subject;
-
-        if (gameConfig.subjects.includes(subject)) {
-
-          el.classList.add("selected");
-        }
-
-        else {
-
-          el.classList.remove("selected");
-        }
-      });
-
-    // CUSTOM MODE
-
-    const customEnabled =
-      gameConfig.subjects.includes("custom");
-
-    document.getElementById("themesList").style.display =
-      customEnabled ? "none" : "flex";
-
-    document.getElementById("customThemeInput").style.display =
-      customEnabled ? "block" : "none";
-
-    // THEMES
-
-    document
-      .querySelectorAll("#themesList .optionItem")
-      .forEach(el => {
-
-        if (el.dataset.theme === gameConfig.theme) {
-
-          el.classList.add("selected");
-        }
-
-        else {
-
-          el.classList.remove("selected");
-        }
-      });
-
-    // SPY TOGGLE
-
-    document.getElementById("spyHasWordToggle").checked =
-      gameConfig.spyHasWord;
-
-    updateSpyDescription();
-
-      // =========================
-      // BOTTOM BUTTON LOGIC
-      // =========================
-
-      const mySocketId = socket.id;
-      const me = room.players.find(p => p.id === mySocketId);
-
-      const isHost = room.host === mySocketId;
-
-      document
-        .querySelectorAll("#configPage .optionItem")
-        .forEach(el => {
-
-          el.style.pointerEvents =
-            isHost ? "auto" : "none";
-
-          el.style.opacity =
-            isHost ? "1" : "0.6";
-        });
-
-      document.getElementById("spyHasWordToggle").disabled =
-        !isHost;
-
-      document.getElementById("launchGameButton").style.display =
-        isHost ? "block" : "none";
-
-      const nonHostPlayers =
-        room.players.filter(p => p.id !== room.host);
-
-      const allReady =
-        room.players.length > 1 &&
-        nonHostPlayers.every(p => p.ready);
-
-      const bottomBtn = document.getElementById("bottomButton");
-
-      if (isHost) {
-
-        bottomBtn.textContent = "JOUER";
-
-        bottomBtn.onclick = () => {
-          socket.emit("openConfig", currentRoomId);
-        };
-
-        bottomBtn.className =
-          allReady ? "" : "disabled";
-
-      } else {
-
-        bottomBtn.textContent =
-          isReady ? "PRÊT ✔" : "PRET";
-
-        bottomBtn.onclick = toggleReady;
-
-        bottomBtn.className =
-          isReady ? "readyOn" : "readyOff";
-      }
-    });
-
-    /* =========================
-       CHAT IN LOBBY
-    ========================== */
-	
-	function sendChat() {
-
-	  const input =
-		document.getElementById("chatInput");
-
-	  const msg = input.value.trim();
-
-	  if (!msg) return;
-
-	  const name =
-		document.getElementById("nameInput").value.trim()
-		|| "Player";
-
-	  socket.emit("chat", {
-		roomId: currentRoomId,
-		name,
-		msg
-	  });
-
-	  input.value = "";
-	}
-	
-	socket.on("chat", ({ name, msg }) => {
-
-	  const chatMessages =
-		document.getElementById("chatMessages");
-
-	  const div = document.createElement("div");
-
-	  div.className = "chatMessage";
-
-	  div.textContent = `${name}: ${msg}`;
-
-	  chatMessages.appendChild(div);
-
-	  chatMessages.scrollTop =
-		chatMessages.scrollHeight;
-	});
-
-
-    /* =========================
-       GAME SELECT
-    ========================== */
-
-    function selectGame(game) {
-
-      const room = window.lastRoom;
-
-      const mySocketId = socket.id;
-
-      const me = room?.players?.find(p => p.id === mySocketId);
-
-      if (!me) return;
-
-      const isHost = room.host === mySocketId;
-
-      if (!isHost) return;
-
-      selectedGame = game;
-
-      document.querySelectorAll(".gameOption")
-        .forEach(el => el.classList.remove("selected"));
-
-      event.target.classList.add("selected");
-
-      socket.emit("selectGame", {
-        roomId: currentRoomId,
-        game
-      });
-    }
-
-    /* =========================
-       GAME READY
-    ========================== */
-    function toggleReady() {
-
-      isReady = !isReady;
-
-      socket.emit("setReady", {
-        roomId: currentRoomId,
-        ready: isReady
-      });
-    }
-
-    /* =========================
-       UNDERCOVER CONFIG
-    ========================== */
-    function updateSpyDescription() {
-
-      const text =
-        gameConfig.spyHasWord
-          ? "Tout le monde à un mot. Pendant deux tours, chaque joueur dis un mot leur évoquant leur mot secret l'un après l'autre. Interdit de dire leur propre mot secret (ou un mot extrêmement similaire). A la fin des deux tour tout le monde vote pour celui qu'il pense être l'espion"
-          : "L'espion n'a pas de mot. Pendant deux tours, chaque joueur pose une question à la personne de son choix, auquel elle doit répondre. Interdit de dire leur propre mot secret (ou un mot extrêmement similaire). A la fin des deux tour tout le monde vote pour celui qu'il pense être l'espion";
-
-      document.getElementById("spyDescription")
-        .textContent = text;
-    }
-
-    function toggleSubject(subject, event) {
-
-      const room = window.lastRoom;
-
-      if (room.host !== socket.id) return;
-
-      // =========================
-      // CUSTOM
-      // =========================
-
-      if (subject === "custom") {
-
-        gameConfig.subjects = ["custom"];
-
-        document
-          .querySelectorAll("#subjectsList .optionItem")
-          .forEach(el => {
-
-            el.classList.remove("selected");
-          });
-
-        event.target.classList.add("selected");
-
-        document.getElementById("themesList").style.display =
-          "none";
-
-        document.getElementById("customThemeInput").style.display =
-          "block";
-      }
-
-      // =========================
-      // NORMAL SUBJECTS
-      // =========================
-
-      else {
-
-        // retire custom
-        gameConfig.subjects =
-          gameConfig.subjects.filter(s => s !== "custom");
-
-        const customElement =
-          document.querySelector('[data-subject="custom"]');
-
-        customElement.classList.remove("selected");
-
-        const alreadySelected =
-          gameConfig.subjects.includes(subject);
-
-        if (alreadySelected) {
-
-          gameConfig.subjects =
-            gameConfig.subjects.filter(s => s !== subject);
-
-          event.target.classList.remove("selected");
-        }
-
-        else {
-
-          gameConfig.subjects.push(subject);
-
-          event.target.classList.add("selected");
-        }
-
-        document.getElementById("themesList").style.display =
-          "flex";
-
-        document.getElementById("customThemeInput").style.display =
-          "none";
-      }
-
-      socket.emit("updateConfig", {
-        roomId: currentRoomId,
-        key: "subjects",
-        value: gameConfig.subjects
-      });
-    }
-
-    function selectTheme(theme, event) {
-
-      const room = window.lastRoom;
-
-      if (room.host !== socket.id) return;
-
-      gameConfig.theme = theme;
-
-      document
-        .querySelectorAll("#themesList .optionItem")
-        .forEach(el => el.classList.remove("selected"));
-
-      event.target.classList.add("selected");
-
-      socket.emit("updateConfig", {
-        roomId: currentRoomId,
-        key: "theme",
-        value: theme
-      });
-    }
-
-    function toggleSpyHasWord() {
-
-      const room = window.lastRoom;
-
-      if (room.host !== socket.id) return;
-
-      gameConfig.spyHasWord =
-        document.getElementById("spyHasWordToggle").checked;
-
-      updateSpyDescription();
-
-      socket.emit("updateConfig", {
-        roomId: currentRoomId,
-        key: "spyHasWord",
-        value: gameConfig.spyHasWord
-      });
-    }
-
-    function launchGame() {
-
-      socket.emit("launchGame", {
-        roomId: currentRoomId
-      });
-    }
-
-    updateSpyDescription();
-  </script>
+<script src="/js/games/undercover/config.js"></script>
+<script src="/js/games/undercover/game.js"></script>
 
 </body>
-
 </html>
