@@ -219,6 +219,64 @@
     }
 
     /* =========================
+       TOGGLE
+    ========================= */
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 54px;
+      height: 28px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+
+      background-color: #555;
+
+      transition: 0.2s;
+
+      border-radius: 34px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+
+      height: 22px;
+      width: 22px;
+
+      left: 3px;
+      bottom: 3px;
+
+      background-color: white;
+
+      transition: 0.2s;
+
+      border-radius: 50%;
+    }
+
+    .switch input:checked + .slider {
+      background-color: #89fa7d;
+    }
+
+    .switch input:checked + .slider:before {
+      transform: translateX(26px);
+    }
+
+    /* =========================
        CONFIG PAGE
     ========================= */
 
@@ -377,12 +435,15 @@
         Sujet
       </div>
 
-      <div class="optionList">
+      <div
+        class="optionList"
+        id="subjectsList"
+      >
 
         <div
           class="optionItem selected"
-          id="subjectPokemon"
-          onclick="toggleSubject('pokemon')"
+          data-subject="pokemon"
+          onclick="toggleSubject('pokemon', event)"
         >
           Pokemon
         </div>
@@ -395,25 +456,40 @@
         Thème
       </div>
 
-      <div class="optionList">
+      <div
+        class="optionList"
+        id="themesList"
+      >
 
-        <div class="optionItem selected"
-             onclick="selectTheme('characters', event)">
+        <div
+          class="optionItem selected"
+          data-theme="characters"
+          onclick="selectTheme('characters', event)"
+        >
           Personnages
         </div>
 
-        <div class="optionItem"
-             onclick="selectTheme('locations', event)">
+        <div
+          class="optionItem"
+          data-theme="locations"
+          onclick="selectTheme('locations', event)"
+        >
           Lieux
         </div>
 
-        <div class="optionItem"
-             onclick="selectTheme('groups', event)">
+        <div
+          class="optionItem"
+          data-theme="groups"
+          onclick="selectTheme('groups', event)"
+        >
           Groupes
         </div>
 
-        <div class="optionItem"
-             onclick="selectTheme('powers', event)">
+        <div
+          class="optionItem"
+          data-theme="powers"
+          onclick="selectTheme('powers', event)"
+        >
           Pouvoirs
         </div>
 
@@ -431,12 +507,18 @@
           Espion a un mot
         </div>
 
-        <input
-          type="checkbox"
-          id="spyHasWordToggle"
-          checked
-          onchange="toggleSpyHasWord()"
-        >
+        <label class="switch">
+
+          <input
+            type="checkbox"
+            id="spyHasWordToggle"
+            checked
+            onchange="toggleSpyHasWord()"
+          >
+
+          <span class="slider"></span>
+
+        </label>
 
       </div>
 
@@ -700,56 +782,53 @@
         playersList.appendChild(li);
       });
 
-      /* =========================
-         CONFIG PAGE SYNC
-      ========================= */
+    /* =========================
+       CONFIG PAGE SYNC
+    ========================= */
 
-      // SUBJECTS
+    // SUBJECTS
 
-      document
-        .querySelectorAll("#configPage .optionList:nth-of-type(1) .optionItem")
-        .forEach(el => el.classList.remove("selected"));
+    document
+      .querySelectorAll("#subjectsList .optionItem")
+      .forEach(el => {
 
-      if (gameConfig.subjects.includes("pokemon")) {
+        const subject =
+          el.dataset.subject;
 
-        document
-          .getElementById("subjectPokemon")
-          .classList.add("selected");
-      }
+        if (gameConfig.subjects.includes(subject)) {
 
-      // THEMES
+          el.classList.add("selected");
+        }
 
-      document
-        .querySelectorAll("#configPage .optionList:nth-of-type(2) .optionItem")
-        .forEach(el => el.classList.remove("selected"));
+        else {
 
-      const themeMap = {
-        characters: 0,
-        locations: 1,
-        groups: 2,
-        powers: 3
-      };
+          el.classList.remove("selected");
+        }
+      });
 
-      const themeIndex =
-        themeMap[gameConfig.theme];
+    // THEMES
 
-      const themeElements =
-        document.querySelectorAll(
-          "#configPage .optionList:nth-of-type(2) .optionItem"
-        );
+    document
+      .querySelectorAll("#themesList .optionItem")
+      .forEach(el => {
 
-      if (themeElements[themeIndex]) {
+        if (el.dataset.theme === gameConfig.theme) {
 
-        themeElements[themeIndex]
-          .classList.add("selected");
-      }
+          el.classList.add("selected");
+        }
 
-      // SPY TOGGLE
+        else {
 
-      document.getElementById("spyHasWordToggle").checked =
-        gameConfig.spyHasWord;
+          el.classList.remove("selected");
+        }
+      });
 
-      updateSpyDescription();
+    // SPY TOGGLE
+
+    document.getElementById("spyHasWordToggle").checked =
+      gameConfig.spyHasWord;
+
+    updateSpyDescription();
 
       // =========================
       // BOTTOM BUTTON LOGIC
@@ -911,16 +990,34 @@
         .textContent = text;
     }
 
-    function toggleSubject(subject) {
+    function toggleSubject(subject, event) {
 
       const room = window.lastRoom;
 
       if (room.host !== socket.id) return;
 
+      const alreadySelected =
+        gameConfig.subjects.includes(subject);
+
+      if (alreadySelected) {
+
+        gameConfig.subjects =
+          gameConfig.subjects.filter(s => s !== subject);
+
+        event.target.classList.remove("selected");
+      }
+
+      else {
+
+        gameConfig.subjects.push(subject);
+
+        event.target.classList.add("selected");
+      }
+
       socket.emit("updateConfig", {
         roomId: currentRoomId,
         key: "subjects",
-        value: [subject]
+        value: gameConfig.subjects
       });
     }
 
@@ -930,7 +1027,10 @@
 
       if (room.host !== socket.id) return;
 
-      document.querySelectorAll(".optionList:nth-of-type(2) .optionItem")
+      gameConfig.theme = theme;
+
+      document
+        .querySelectorAll("#themesList .optionItem")
         .forEach(el => el.classList.remove("selected"));
 
       event.target.classList.add("selected");
