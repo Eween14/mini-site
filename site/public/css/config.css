@@ -1,0 +1,41 @@
+.sectionTitle {
+  text-align: center;
+  font-size: 28px;
+  margin-top: 20px;
+}
+
+.optionList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.optionItem {
+  background: #2f3136;
+  padding: 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  text-align: center;
+  border: 2px solid transparent;
+}
+
+.optionItem.selected {
+  border-color: #89fa7d;
+}
+
+.toggleRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.descriptionText {
+  background: #2f3136;
+  padding: 12px;
+  border-radius: 6px;
+  line-height: 1.5;
+}
+
+#customThemeInput {
+  margin-top: 10px;
+}

@@ -1,0 +1,60 @@
+#playersList {
+  list-style: none;
+  padding: 0;
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+#playersList li {
+  background: #2f3136;
+  padding: 12px;
+  border-radius: 6px;
+}
+
+.roomCode {
+  text-align: center;
+  font-size: 40px;
+  font-weight: bold;
+}
+
+#gameSelect {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.gameOption {
+  padding: 10px;
+  border-radius: 6px;
+  background: #2f3136;
+  text-align: center;
+  cursor: pointer;
+  border: 2px solid transparent;
+}
+
+.gameOption.selected {
+  border-color: #89fa7d;
+}
+
+#bottomButton {
+  margin-top: 20px;
+  width: 100%;
+}
+
+.readyOn {
+  background: #89fa7d;
+  color: white;
+}
+
+.readyOff {
+  background: transparent;
+  border: 2px solid #888;
+  color: white;
+}
+
+.disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
