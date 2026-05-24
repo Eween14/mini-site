@@ -23,7 +23,10 @@ function updateRoom(roomId) {
 
   if (!room) return;
 
-  io.to(roomId).emit("roomUpdate", room);
+  io.to(roomId).emit("roomUpdate", {
+      id: roomId,
+      ...room
+    });
 
   // check si tous les sockets encore connectés sont valides
   room.players.forEach(p => {
