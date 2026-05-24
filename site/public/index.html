@@ -218,6 +218,56 @@
       pointer-events: none;
     }
 
+    /* =========================
+       CONFIG PAGE
+    ========================= */
+
+    #configPage {
+      display: none;
+    }
+
+    .sectionTitle {
+      text-align: center;
+      font-size: 28px;
+      margin-top: 20px;
+    }
+
+    .optionList {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .optionItem {
+      background: #2f3136;
+      padding: 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      text-align: center;
+      border: 2px solid transparent;
+    }
+
+    .optionItem.selected {
+      border-color: #89fa7d;
+    }
+
+    .toggleRow {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .descriptionText {
+      background: #2f3136;
+      padding: 12px;
+      border-radius: 6px;
+      line-height: 1.5;
+    }
+
+    #launchGameButton {
+      margin-top: 20px;
+    }
+
   </style>
 </head>
 
@@ -312,6 +362,103 @@
   </div>
 
   <!-- =========================
+       CONFIG PAGE
+  ========================== -->
+
+  <div class="page" id="configPage">
+
+    <div class="centerColumn">
+
+      <h1>GAMEROOM</h1>
+
+      <!-- SUBJECT -->
+
+      <div class="sectionTitle">
+        Sujet
+      </div>
+
+      <div class="optionList">
+
+        <div
+          class="optionItem selected"
+          id="subjectPokemon"
+          onclick="toggleSubject('pokemon')"
+        >
+          Pokemon
+        </div>
+
+      </div>
+
+      <!-- THEME -->
+
+      <div class="sectionTitle">
+        Thème
+      </div>
+
+      <div class="optionList">
+
+        <div class="optionItem selected"
+             onclick="selectTheme('characters', event)">
+          Personnages
+        </div>
+
+        <div class="optionItem"
+             onclick="selectTheme('locations', event)">
+          Lieux
+        </div>
+
+        <div class="optionItem"
+             onclick="selectTheme('groups', event)">
+          Groupes
+        </div>
+
+        <div class="optionItem"
+             onclick="selectTheme('powers', event)">
+          Pouvoirs
+        </div>
+
+      </div>
+
+      <!-- SPY -->
+
+      <div class="sectionTitle">
+        Espion
+      </div>
+
+      <div class="toggleRow">
+
+        <div>
+          Espion a un mot
+        </div>
+
+        <input
+          type="checkbox"
+          id="spyHasWordToggle"
+          checked
+          onchange="toggleSpyHasWord()"
+        >
+
+      </div>
+
+      <div
+        class="descriptionText"
+        id="spyDescription"
+      ></div>
+
+      <!-- LAUNCH -->
+
+      <button
+        id="launchGameButton"
+        onclick="launchGame()"
+      >
+        Lancer
+      </button>
+
+    </div>
+
+  </div>
+
+  <!-- =========================
        SOCKET.IO
   ========================== -->
 
@@ -325,6 +472,12 @@
     let currentRoomId = null;
     let isReady = false;
     let selectedGame = "undercover";
+
+    let gameConfig = {
+      subjects: ["pokemon"],
+      theme: "characters",
+      spyHasWord: true
+    };
 
     /* =========================
        RANDOM ROOM ID
@@ -539,9 +692,12 @@
 
       const isHost = room.host === mySocketId;
 
+      const nonHostPlayers =
+        room.players.filter(p => p.id !== room.host);
+
       const allReady =
         room.players.length > 1 &&
-        room.players.every(p => p.ready);
+        nonHostPlayers.every(p => p.ready);
 
       const bottomBtn = document.getElementById("bottomButton");
 
@@ -550,7 +706,9 @@
         bottomBtn.textContent = "JOUER";
 
         bottomBtn.onclick = () => {
-          socket.emit("startGame", currentRoomId);
+          document.getElementById("roomPage").style.display = "none";
+
+          document.getElementById("configPage").style.display = "flex";
         };
 
         bottomBtn.className =
@@ -656,6 +814,77 @@
       });
     }
 
+    /* =========================
+       UNDERCOVER CONFIG
+    ========================== */
+    function updateSpyDescription() {
+
+      const text =
+        gameConfig.spyHasWord
+          ? "Tout le monde à un mot. Pendant deux tours, chaque joueur dis un mot leur évoquant leur mot secret l'un après l'autre. Interdit de dire leur propre mot secret (ou un mot extrêmement similaire). A la fin des deux tour tout le monde vote pour celui qu'il pense être l'espion"
+          : "L'espion n'a pas de mot. Pendant deux tours, chaque joueur pose une question à la personne de son choix, auquel elle doit répondre. Interdit de dire leur propre mot secret (ou un mot extrêmement similaire). A la fin des deux tour tout le monde vote pour celui qu'il pense être l'espion";
+
+      document.getElementById("spyDescription")
+        .textContent = text;
+    }
+
+    function toggleSubject(subject) {
+
+      const room = window.lastRoom;
+
+      if (room.host !== socket.id) return;
+
+      socket.emit("updateConfig", {
+        roomId: currentRoomId,
+        key: "subjects",
+        value: [subject]
+      });
+    }
+
+    function selectTheme(theme, event) {
+
+      const room = window.lastRoom;
+
+      if (room.host !== socket.id) return;
+
+      document.querySelectorAll(".optionList:nth-of-type(2) .optionItem")
+        .forEach(el => el.classList.remove("selected"));
+
+      event.target.classList.add("selected");
+
+      socket.emit("updateConfig", {
+        roomId: currentRoomId,
+        key: "theme",
+        value: theme
+      });
+    }
+
+    function toggleSpyHasWord() {
+
+      const room = window.lastRoom;
+
+      if (room.host !== socket.id) return;
+
+      gameConfig.spyHasWord =
+        document.getElementById("spyHasWordToggle").checked;
+
+      updateSpyDescription();
+
+      socket.emit("updateConfig", {
+        roomId: currentRoomId,
+        key: "spyHasWord",
+        value: gameConfig.spyHasWord
+      });
+    }
+
+    function launchGame() {
+
+      socket.emit("launchGame", {
+        roomId: currentRoomId
+      });
+    }
+
+    updateSpyDescription();
   </script>
 
 </body>

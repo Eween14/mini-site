@@ -142,6 +142,12 @@ io.on("connection", (socket) => {
     removePlayer(socket);
   });
 
+  config: {
+    subjects: ["pokemon"],
+    theme: "characters",
+    spyHasWord: true
+  },
+
   // -------------------------
   // JOIN ROOM
   // -------------------------
@@ -238,6 +244,25 @@ io.on("connection", (socket) => {
   socket.on("chat", ({ roomId, name, msg }) => {
 
     io.to(roomId).emit("chat", { name, msg });
+  });
+
+  // -------------------------
+  // CONFIG
+  // -------------------------
+  socket.on("updateConfig", ({
+    roomId,
+    key,
+    value
+  }) => {
+
+    const room = rooms[roomId];
+    if (!room) return;
+
+    if (room.host !== socket.id) return;
+
+    room.config[key] = value;
+
+    updateRoom(roomId);
   });
 
 });
