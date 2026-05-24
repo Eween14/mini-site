@@ -17,6 +17,7 @@ function createLobbyMode() {
   `;
 
   document.getElementById("rightButton").onclick = confirmCreateLobby;
+  state.name = document.getElementById("nameInput").value.trim();
 }
 
 function joinLobbyMode() {
@@ -26,6 +27,7 @@ function joinLobbyMode() {
   `;
 
   document.getElementById("rightButton").onclick = confirmJoinLobby;
+  state.name = document.getElementById("nameInput").value.trim();
 }
 
 function resetMainPage() {

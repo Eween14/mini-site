@@ -11,20 +11,18 @@ function selectGame(game) {
 }
 
 function toggleReady() {
-    isReady = !isReady;
+    state.isReady = !state.isReady;
 
     socket.emit("setReady", {
         roomId: state.currentRoomId,
-        ready: isReady
+        ready: state.isReady
     });
 }
 
 socket.on("roomUpdate", (room) => {
 
     state.room = room;
-    state.currentRoomId = room.id;
-
-    console.log("ROOM STATE:", room.state);
+    state.currentRoomId = room.id || state.currentRoomId;
 
     if (room.state === "lobby") {
         showView("lobby");
@@ -46,7 +44,7 @@ socket.on("roomUpdate", (room) => {
         btn.textContent = "JOUER";
         btn.onclick = () => socket.emit("openConfig", state.currentRoomId);
     } else {
-        btn.textContent = isReady ? "PRÊT ✔" : "PRÊT";
+        btn.textContent = state.isReady ? "PRÊT ✔" : "PRÊT";
         btn.onclick = toggleReady;
     }
 });
