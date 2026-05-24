@@ -17,7 +17,6 @@ function createLobbyMode() {
   `;
 
   document.getElementById("rightButton").onclick = confirmCreateLobby;
-  state.name = document.getElementById("nameInput").value.trim();
 }
 
 function joinLobbyMode() {
@@ -27,7 +26,6 @@ function joinLobbyMode() {
   `;
 
   document.getElementById("rightButton").onclick = confirmJoinLobby;
-  state.name = document.getElementById("nameInput").value.trim();
 }
 
 function resetMainPage() {
@@ -42,8 +40,11 @@ function confirmCreateLobby() {
   const name = document.getElementById("nameInput").value.trim() || "Host";
 
   state.currentRoomId = roomId;
+  state.name = name;
 
   socket.emit("createRoom", { roomId, name, password: null });
+
+  showView("lobby");
 }
 
 function confirmJoinLobby() {
@@ -54,6 +55,8 @@ function confirmJoinLobby() {
   state.currentRoomId = roomId;
 
   socket.emit("joinRoom", { roomId, name, password: null });
+
+  showView("lobby");
 }
 
 function leaveLobby() {

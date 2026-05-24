@@ -1,20 +1,21 @@
+const VIEW_IDS = {
+  main: "mainPage",
+  lobby: "roomPage",
+  config: "configPage"
+};
+
 function showView(view) {
 
-  const views = ["mainPage", "roomPage", "configPage"];
-
-  views.forEach(id => {
-    document.getElementById(id).classList.remove("active");
+  // désactive toutes les vues
+  Object.values(VIEW_IDS).forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove("active");
   });
 
-  if (view === "main") {
-    document.getElementById("mainPage").classList.add("active");
-  }
+  // active la vue demandée
+  const targetId = VIEW_IDS[view];
+  if (!targetId) return;
 
-  if (view === "lobby") {
-    document.getElementById("roomPage").classList.add("active");
-  }
-
-  if (view === "config") {
-    document.getElementById("configPage").classList.add("active");
-  }
+  const target = document.getElementById(targetId);
+  if (target) target.classList.add("active");
 }
