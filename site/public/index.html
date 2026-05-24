@@ -384,22 +384,6 @@
 
         <ul id="playersList"></ul>
 
-        <!-- CHAT -->
-        <div id="chatContainer">
-
-          <div id="chatMessages"></div>
-
-          <div id="chatInputRow">
-
-            <input id="chatInput" placeholder="Message...">
-
-            <button id="sendChatButton" onclick="sendChat()">
-              ↑
-            </button>
-
-          </div>
-        </div>
-
         <!-- GAME SELECT -->
         <div id="gameSelect">
           <div class="gameOption selected" onclick="selectGame('undercover')">
@@ -428,6 +412,23 @@
     <div class="centerColumn">
 
       <h1>GAMEROOM</h1>
+
+      <!-- CHAT (CONFIG) -->
+      <div id="chatContainer">
+
+        <div id="chatMessages"></div>
+
+        <div id="chatInputRow">
+
+          <input id="chatInput" placeholder="Message...">
+
+          <button id="sendChatButton" onclick="sendChat()">
+            ↑
+          </button>
+
+        </div>
+
+      </div>
 
       <!-- SUBJECT -->
 
@@ -750,7 +751,6 @@
       currentRoomId = null;
 
       document.getElementById("playersList").innerHTML = "";
-      document.getElementById("chatMessages").innerHTML = "";
     }
 
     /* =========================
@@ -762,7 +762,6 @@
       window.lastRoom = room;
 
       document.getElementById("mainPage").style.display = "none";
-      document.getElementById("roomPage").style.display = "none";
       document.getElementById("configPage").style.display = "none";
 
       gameConfig = room.config || gameConfig;
@@ -773,13 +772,11 @@
 
         document.getElementById("mainPage").style.display = "none";
         document.getElementById("configPage").style.display = "none";
-        document.getElementById("roomPage").style.display = "flex";
       }
 
       else if (room.state === "config") {
 
         document.getElementById("mainPage").style.display = "none";
-        document.getElementById("roomPage").style.display = "none";
         document.getElementById("configPage").style.display = "flex";
       }
 
