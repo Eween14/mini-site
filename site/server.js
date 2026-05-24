@@ -112,11 +112,20 @@ io.on("connection", (socket) => {
       password: password || null,
       players: [],
       state: "lobby",
+      game: "undercover",
+      config: {
+        subjects: ["pokemon"],
+        theme: "characters",
+        spyHasWord: true
+      },
       round: 0,
       order: [],
       spyId: null,
       votes: {},
-      scores: { team: 0, spy: 0 }
+      scores: {
+        team: 0,
+        spy: 0
+      }
     };
 
     socket.join(roomId);
@@ -141,12 +150,6 @@ io.on("connection", (socket) => {
 
     removePlayer(socket);
   });
-
-  config: {
-    subjects: ["pokemon"],
-    theme: "characters",
-    spyHasWord: true
-  },
 
   // -------------------------
   // JOIN ROOM
@@ -261,6 +264,18 @@ io.on("connection", (socket) => {
     if (room.host !== socket.id) return;
 
     room.config[key] = value;
+
+    updateRoom(roomId);
+  });
+
+  socket.on("openConfig", (roomId) => {
+
+    const room = rooms[roomId];
+    if (!room) return;
+
+    if (room.host !== socket.id) return;
+
+    room.state = "config";
 
     updateRoom(roomId);
   });

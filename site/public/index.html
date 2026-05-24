@@ -659,9 +659,26 @@
       window.lastRoom = room;
 
       document.getElementById("mainPage").style.display = "none";
-      document.getElementById("roomPage").style.display = "flex";
+      document.getElementById("roomPage").style.display = "none";
+      document.getElementById("configPage").style.display = "none";
+
+      gameConfig = room.config || gameConfig;
 
       document.getElementById("roomCode").textContent = currentRoomId;
+
+      if (room.state === "lobby") {
+
+        document.getElementById("mainPage").style.display = "none";
+        document.getElementById("configPage").style.display = "none";
+        document.getElementById("roomPage").style.display = "flex";
+      }
+
+      else if (room.state === "config") {
+
+        document.getElementById("mainPage").style.display = "none";
+        document.getElementById("roomPage").style.display = "none";
+        document.getElementById("configPage").style.display = "flex";
+      }
 
       // PLAYERS
       const playersList = document.getElementById("playersList");
@@ -683,6 +700,57 @@
         playersList.appendChild(li);
       });
 
+      /* =========================
+         CONFIG PAGE SYNC
+      ========================= */
+
+      // SUBJECTS
+
+      document
+        .querySelectorAll("#configPage .optionList:nth-of-type(1) .optionItem")
+        .forEach(el => el.classList.remove("selected"));
+
+      if (gameConfig.subjects.includes("pokemon")) {
+
+        document
+          .getElementById("subjectPokemon")
+          .classList.add("selected");
+      }
+
+      // THEMES
+
+      document
+        .querySelectorAll("#configPage .optionList:nth-of-type(2) .optionItem")
+        .forEach(el => el.classList.remove("selected"));
+
+      const themeMap = {
+        characters: 0,
+        locations: 1,
+        groups: 2,
+        powers: 3
+      };
+
+      const themeIndex =
+        themeMap[gameConfig.theme];
+
+      const themeElements =
+        document.querySelectorAll(
+          "#configPage .optionList:nth-of-type(2) .optionItem"
+        );
+
+      if (themeElements[themeIndex]) {
+
+        themeElements[themeIndex]
+          .classList.add("selected");
+      }
+
+      // SPY TOGGLE
+
+      document.getElementById("spyHasWordToggle").checked =
+        gameConfig.spyHasWord;
+
+      updateSpyDescription();
+
       // =========================
       // BOTTOM BUTTON LOGIC
       // =========================
@@ -691,6 +759,23 @@
       const me = room.players.find(p => p.id === mySocketId);
 
       const isHost = room.host === mySocketId;
+
+      document
+        .querySelectorAll("#configPage .optionItem")
+        .forEach(el => {
+
+          el.style.pointerEvents =
+            isHost ? "auto" : "none";
+
+          el.style.opacity =
+            isHost ? "1" : "0.6";
+        });
+
+      document.getElementById("spyHasWordToggle").disabled =
+        !isHost;
+
+      document.getElementById("launchGameButton").style.display =
+        isHost ? "block" : "none";
 
       const nonHostPlayers =
         room.players.filter(p => p.id !== room.host);
@@ -706,9 +791,7 @@
         bottomBtn.textContent = "JOUER";
 
         bottomBtn.onclick = () => {
-          document.getElementById("roomPage").style.display = "none";
-
-          document.getElementById("configPage").style.display = "flex";
+          socket.emit("openConfig", currentRoomId);
         };
 
         bottomBtn.className =
