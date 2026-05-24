@@ -20,24 +20,23 @@ const rooms = {};
 function updateRoom(roomId) {
 
   const room = rooms[roomId];
-
   if (!room) return;
 
+  room.players = room.players.filter(p =>
+    io.sockets.sockets.has(p.id)
+  );
+
+  const nonHostPlayers =
+    room.players.filter(p => p.id !== room.host);
+
+  const allReady =
+    room.players.length > 1 &&
+    nonHostPlayers.every(p => p.ready);
+
   io.to(roomId).emit("roomUpdate", {
-      id: roomId,
-      ...room
-    });
-
-  // check si tous les sockets encore connectés sont valides
-  room.players.forEach(p => {
-
-    const socketExists =
-      io.sockets.sockets.has(p.id);
-
-    if (!socketExists) {
-
-      io.to(p.id).emit("kickedFromRoom");
-    }
+    id: roomId,
+    ...room,
+    allReady
   });
 }
 

@@ -41,9 +41,18 @@ socket.on("roomUpdate", (room) => {
     const btn = document.getElementById("bottomButton");
 
     if (isHost) {
+
         btn.textContent = "JOUER";
         btn.onclick = () => socket.emit("openConfig", state.currentRoomId);
+
+        if (room.allReady) {
+            btn.classList.remove("disabled");
+        } else {
+            btn.classList.add("disabled");
+        }
+
     } else {
+
         btn.textContent = state.isReady ? "PRÊT ✔" : "PRÊT";
         btn.onclick = toggleReady;
     }
