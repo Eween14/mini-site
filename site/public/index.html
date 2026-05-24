@@ -448,13 +448,26 @@
           Pokemon
         </div>
 
+        <div
+          class="optionItem"
+          data-subject="custom"
+          onclick="toggleSubject('custom', event)"
+        >
+          Custom
+        </div>
+
       </div>
 
       <!-- THEME -->
 
-      <div class="sectionTitle">
+      <div
+        class="sectionTitle"
+        id="themeTitle"
+      >
         Thème
       </div>
+
+      <!-- THEMES NORMAL -->
 
       <div
         class="optionList"
@@ -494,6 +507,14 @@
         </div>
 
       </div>
+
+      <!-- CUSTOM INPUT -->
+
+      <input
+        id="customThemeInput"
+        placeholder="Votre mot personnalisé..."
+        style="display:none;"
+      >
 
       <!-- SPY -->
 
@@ -806,6 +827,17 @@
         }
       });
 
+    // CUSTOM MODE
+
+    const customEnabled =
+      gameConfig.subjects.includes("custom");
+
+    document.getElementById("themesList").style.display =
+      customEnabled ? "none" : "flex";
+
+    document.getElementById("customThemeInput").style.display =
+      customEnabled ? "block" : "none";
+
     // THEMES
 
     document
@@ -996,22 +1028,68 @@
 
       if (room.host !== socket.id) return;
 
-      const alreadySelected =
-        gameConfig.subjects.includes(subject);
+      // =========================
+      // CUSTOM
+      // =========================
 
-      if (alreadySelected) {
+      if (subject === "custom") {
 
-        gameConfig.subjects =
-          gameConfig.subjects.filter(s => s !== subject);
+        gameConfig.subjects = ["custom"];
 
-        event.target.classList.remove("selected");
+        document
+          .querySelectorAll("#subjectsList .optionItem")
+          .forEach(el => {
+
+            el.classList.remove("selected");
+          });
+
+        event.target.classList.add("selected");
+
+        document.getElementById("themesList").style.display =
+          "none";
+
+        document.getElementById("customThemeInput").style.display =
+          "block";
       }
+
+      // =========================
+      // NORMAL SUBJECTS
+      // =========================
 
       else {
 
-        gameConfig.subjects.push(subject);
+        // retire custom
+        gameConfig.subjects =
+          gameConfig.subjects.filter(s => s !== "custom");
 
-        event.target.classList.add("selected");
+        const customElement =
+          document.querySelector('[data-subject="custom"]');
+
+        customElement.classList.remove("selected");
+
+        const alreadySelected =
+          gameConfig.subjects.includes(subject);
+
+        if (alreadySelected) {
+
+          gameConfig.subjects =
+            gameConfig.subjects.filter(s => s !== subject);
+
+          event.target.classList.remove("selected");
+        }
+
+        else {
+
+          gameConfig.subjects.push(subject);
+
+          event.target.classList.add("selected");
+        }
+
+        document.getElementById("themesList").style.display =
+          "flex";
+
+        document.getElementById("customThemeInput").style.display =
+          "none";
       }
 
       socket.emit("updateConfig", {
