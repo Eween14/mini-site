@@ -42,28 +42,28 @@ socket.on("roomUpdate", (room) => {
 
     if (isHost) {
         btn.style.display = "block";
-
         const nonHostPlayers =
             room.players.filter(p => p.id !== room.host);
-
         const allReady =
             room.players.length > 1 &&
             nonHostPlayers.every(p => p.ready);
-
         btn.textContent = "JOUER";
-
         btn.onclick = () => {
+
             if (!allReady) return;
+
             socket.emit("openConfig", state.currentRoomId);
         };
-
         if (allReady) {
             btn.classList.remove("disabled");
         } else {
             btn.classList.add("disabled");
         }
-
     } else {
-        btn.style.display = "none";
+        btn.style.display = "block";
+        btn.classList.remove("disabled");
+        btn.textContent =
+            state.isReady ? "PRÊT ✔" : "PRÊT";
+        btn.onclick = toggleReady;
     }
 });
