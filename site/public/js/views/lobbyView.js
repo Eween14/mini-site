@@ -22,6 +22,7 @@ function toggleReady() {
 socket.on("roomUpdate", (room) => {
 
     state.room = room;
+    updateConfigVisuals();
     state.currentRoomId = room.id || state.currentRoomId;
 
     if (room.state === "lobby") {

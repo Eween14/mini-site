@@ -75,7 +75,7 @@
     <div class="sectionTitle">Sujet</div>
 
     <div class="optionList" id="subjectsList">
-      <div class="optionItem selected" data-subject="pokemon" onclick="toggleSubject('pokemon', event)">Pokemon</div>
+      <div class="optionItem selected" data-subject="pokemon" onclick="toggleSubject('pokemon')">Pokemon</div>
       <div class="optionItem" data-subject="custom" onclick="toggleSubject('custom', event)">Custom</div>
     </div>
 
@@ -90,6 +90,11 @@
     </div>
 
     <input id="customThemeInput" placeholder="Entrez un sujet..." style="display:none;">
+
+    <div class="descriptionText" id="customDescription" style="display:none;">
+      2 joueurs : chaque joueur choisi un sujet et chacun devra poser des questions pour deviner le mot de l'autre.<br><br>
+      3 joueurs ou + : chaque joueur choisi un sujet, un sujet est pris au hasard et attribué à tout le monde sauf l'espion qui doit deviner quel est le vrai sujet.
+    </div>
 
     <!-- SPY -->
     <div class="sectionTitle">Espion</div>

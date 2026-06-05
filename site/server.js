@@ -117,7 +117,7 @@ io.on("connection", (socket) => {
       game: "undercover",
       config: {
         subjects: ["pokemon"],
-        theme: "characters",
+        themes: ["characters"],
         spyHasWord: true
       },
       round: 0,

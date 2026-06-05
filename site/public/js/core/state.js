@@ -4,10 +4,10 @@ window.state = {
     isReady: false,
 
     gameConfig: {
-        subjects: ["pokemon"],
-        theme: "characters",
-        spyHasWord: true
-    },
+      subjects: ["pokemon"],
+      themes: ["characters"],
+      spyHasWord: true
+    }
 
     name: null
 };
