@@ -53,6 +53,7 @@ function confirmJoinLobby() {
   const name = document.getElementById("nameInput").value.trim() || "Player";
 
   state.currentRoomId = roomId;
+  state.name = name;
 
   socket.emit("joinRoom", { roomId, name, password: null });
 
