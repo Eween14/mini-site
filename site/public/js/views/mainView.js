@@ -43,8 +43,6 @@ function confirmCreateLobby() {
   state.name = name;
 
   socket.emit("createRoom", { roomId, name, password: null });
-
-  showView("lobby");
 }
 
 function confirmJoinLobby() {
@@ -56,8 +54,6 @@ function confirmJoinLobby() {
   state.name = name;
 
   socket.emit("joinRoom", { roomId, name, password: null });
-
-  showView("lobby");
 }
 
 function leaveLobby() {

@@ -22,6 +22,7 @@ function toggleReady() {
 socket.on("roomUpdate", (room) => {
 
     state.room = room;
+    if (room.players.find(p => p.id === socket.id) === undefined) return;
     updateConfigVisuals();
     state.currentRoomId = room.id || state.currentRoomId;
 
@@ -63,8 +64,13 @@ socket.on("roomUpdate", (room) => {
     } else {
         btn.style.display = "block";
         btn.classList.remove("disabled");
-        btn.textContent =
-            state.isReady ? "PRÊT ✔" : "PRÊT";
-        btn.onclick = toggleReady;
+        btn.textContent = state.isReady ? "PRÊT ✔" : "PRÊT";
+        btn.onclick = () => {
+            state.isReady = !state.isReady;
+            socket.emit("setReady", {
+                roomId: state.currentRoomId,
+                ready: state.isReady
+            });
+        };
     }
 });
