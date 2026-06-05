@@ -65,3 +65,5 @@ function leaveLobby() {
   showView("main");
   resetMainPage();
 }
+
+showView("main");
