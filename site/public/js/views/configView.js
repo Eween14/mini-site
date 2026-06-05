@@ -1,8 +1,8 @@
 function updateSpyDescription() {
 
   const text = state.gameConfig.spyHasWord
-    ? "Mode mot par joueur"
-    : "Mode questions";
+    ? "Mode mot par joueur<br><br>2 joueurs : chaque joueur choisi un sujet et chacun devra poser des questions pour deviner le mot de l'autre."
+    : "Mode questions<br><br>3 joueurs ou + : chaque joueur choisi un sujet, un sujet est pris au hasard et attribué à tout le monde sauf l'espion qui doit deviner quel est le vrai sujet.";
 
   document.getElementById("spyDescription").textContent = text;
 }
